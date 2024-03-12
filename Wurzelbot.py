@@ -15,7 +15,7 @@ startX, startY = pyautogui.position()
 try:
     if(len(sys.argv) == 2):
         newI = int(sys.argv[1])
-        if(newI < 204):
+        if 0 <= newI <= 204:
             I = newI
 except ValueError:
     pass
