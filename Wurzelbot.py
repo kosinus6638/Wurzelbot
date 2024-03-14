@@ -9,10 +9,9 @@ SUFFIXES = "crhv"
 REGEX_NUM = "^\d{1,3}$"
 REGEX_CHAR = "^\d{{1,3}}[{SUF}]$".format(SUF = SUFFIXES)
 
-CLICK = True
-
 
 class Options:
+    click = True
     rows = 12
     columns = 17
     plant_dim = 40
@@ -106,7 +105,7 @@ def plant_field(opts):
             broken = (i==opts.I)
             if broken:
                 break
-            if CLICK:
+            if opts.click:
                 pyautogui.click()
             i += 1
             advance()
