@@ -5,7 +5,6 @@ import sys
 import re
 
 
-
 SUFFIXES = "crhv"
 REGEX_NUM = "^\d{1,3}$"
 REGEX_CHAR = "^\d{{1,3}}[{SUF}]$".format(SUF = SUFFIXES)
@@ -79,42 +78,38 @@ def plant_field(opts):
     pyautogui.PAUSE = opts.duration
     startX,startY = pyautogui.position()
 
-    if opts.horizontal:
-        i = 0
-        broken = False
+    # Choose different resposition functions for vertical and horizontal movement
+    reposition = (
+        lambda d: pyautogui.moveTo(startX, startY+opts.plant_dim*d, pyautogui.PAUSE) 
+        if opts.horizontal else 
+        pyautogui.moveTo(startX + opts.plant_dim*d, startY, pyautogui.PAUSE)
+    )
 
-        for y in range(opts.rows):
+    # Choose different advance functions for vertical and horizontal movement
+    advance = ( 
+        lambda : pyautogui.move(opts.plant_dim, 0, pyautogui.PAUSE) 
+        if opts.horizontal else 
+        pyautogui.move(0, opts.plant_dim, pyautogui.PAUSE)
+    )
 
+    outer,inner = (opts.rows, opts.columns) if opts.horizontal else (opts.columns, opts.rows)
+
+    i = 0
+    broken = False
+
+    for y in range(outer):
+        if broken:
+            break
+
+        reposition(y)
+        for x in range(inner):
+            broken = (i==opts.I)
             if broken:
                 break
-
-            pyautogui.moveTo(startX, startY + opts.plant_dim*y, pyautogui.PAUSE)
-            for x in range(opts.columns):
-                broken = (i==opts.I)
-                if broken:
-                    break
-                if CLICK:
-                    pyautogui.click()
-                i += 1
-                pyautogui.move(opts.plant_dim, 0, pyautogui.PAUSE)
-    else:
-        i = 0
-        broken = False
-        
-        for y in range(opts.columns):
-
-            if broken:
-                break
-
-            pyautogui.moveTo(startX + opts.plant_dim*y, startY, pyautogui.PAUSE)
-            for x in range(opts.rows):
-                broken = (i==opts.I)
-                if broken:
-                    break
-                if CLICK:
-                    pyautogui.click()
-                i += 1
-                pyautogui.move(0, opts.plant_dim, pyautogui.PAUSE)
+            if CLICK:
+                pyautogui.click()
+            i += 1
+            advance()
 
 
 def main():
@@ -123,10 +118,6 @@ def main():
     if opts is None:
         print("Error parsing options")
         exit()
-
-    print(opts.I)
-    print(opts.horizontal)
-    print(opts.duration)
 
     plant_field(opts)
 
