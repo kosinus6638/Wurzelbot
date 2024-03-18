@@ -21,7 +21,6 @@ class Options:
 
 
 def get_opts():
-    global I
     retval = Options()
 
     if len(sys.argv) > 1:
