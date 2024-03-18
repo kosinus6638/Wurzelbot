@@ -40,20 +40,20 @@ def get_opts():
             # Make plant intructions
             match to_be_planted[-1]:
                 case 'c':
-                    if 0 < n < retval.columns:
-                        retval.horizontal = False
+                    retval.horizontal = False
+                    if 0 < n <= retval.columns:
                         retval.I = n*retval.rows
                 case 'r':
-                    if 0 < n < retval.rows:
-                        retval.horizontal = True
+                    retval.horizontal = True
+                    if 0 < n <= retval.rows:
                         retval.I = n*retval.columns
                 case 'h':
-                    if 0 < n < retval.columns*retval.rows:
-                        retval.horizontal = True
+                    retval.horizontal = True
+                    if 0 < n <= retval.columns*retval.rows:
                         retval.I = n
                 case 'v':
-                    if 0 < n < retval.columns*retval.rows:
-                        retval.horizontal = False
+                    retval.horizontal = False
+                    if 0 < n <= retval.columns*retval.rows:
                         retval.I = n
                 case _:
                     retval = None
