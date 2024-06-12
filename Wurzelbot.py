@@ -6,8 +6,8 @@ import re
 
 
 SUFFIXES = "crhv"
-REGEX_NUM = "^\d{1,3}$"
-REGEX_CHAR = "^\d{{1,3}}[{SUF}]$".format(SUF = SUFFIXES)
+REGEX_NUM = r"^\d{1,3}$"
+REGEX_CHAR = r"^\d{{1,3}}[{SUF}]$".format(SUF = SUFFIXES)
 
 
 class Options:
@@ -17,7 +17,7 @@ class Options:
     plant_dim = 40
     horizontal = True
     I = 204
-    duration = 0.01
+    duration = 0.03
 
 
 def get_opts():
