@@ -3,6 +3,7 @@
 import pyautogui
 import sys
 import re
+from dataclasses import dataclass
 
 
 SUFFIXES = "crhv"
@@ -10,6 +11,7 @@ REGEX_NUM = r"^\d{1,3}$"
 REGEX_CHAR = r"^\d{{1,3}}[{SUF}]$".format(SUF = SUFFIXES)
 
 
+@dataclass
 class Options:
     click = True
     rows = 12
