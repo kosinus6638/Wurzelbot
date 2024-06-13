@@ -16,9 +16,9 @@ class Options:
     click = True
     rows = 12
     columns = 17
+    I = rows * columns
     plant_dim = 40
     horizontal = True
-    I = 204
     duration = 0.03
 
 
