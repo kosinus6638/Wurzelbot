@@ -4,11 +4,16 @@ import pyautogui
 import sys
 import re
 from dataclasses import dataclass
+import configparser
+import os
 
 
 SUFFIXES = "crhv"
 REGEX_NUM = r"^\d{1,3}$"
 REGEX_CHAR = r"^\d{{1,3}}[{SUF}]$".format(SUF = SUFFIXES)
+
+config_file = "config.ini"
+default_section = "DEFAULT"
 
 
 @dataclass
@@ -22,8 +27,79 @@ class Options:
     duration = 0.03
 
 
-def get_opts():
+def error_msg_helper(what, err, appendix=None):
+    retval = f"Error {what}: {err}"
+    if appendix:
+        retval = f"{retval}\n{appendix}"
+    return retval
+
+
+def create_config_file(path):
+    print(f"Creating initial config file \'{path}\'")
+    initial_opts = Options()
+    config = configparser.ConfigParser()
+
+    config[default_section] = {
+        "click": str(initial_opts.click),
+        "rows": str(initial_opts.rows),
+        "columns": str(initial_opts.columns),
+        "plant_dim": str(initial_opts.plant_dim),
+        "duration": str(initial_opts.duration),
+    }
+
+    with open(path, "w") as file:
+        config.write(file)
+
+
+def get_config_file_path():
+    config_dir = os.path.join(
+        os.environ.get("APPDATA") or
+        os.environ.get("XDG_CONFIG_HOME") or
+        os.path.join( os.environ["HOME"], ".config" ), "Wurzelbot"
+    )
+
+    try:
+        if not os.path.exists(config_dir):
+            print(f"Creating missing directory {config_dir}")
+            os.makedirs(config_dir)
+    except Exception as e:
+        print( error_msg_helper("creating config dir", e) )
+        config_dir = "."
+
+    return os.path.abspath( os.path.join(config_dir, config_file) )
+
+
+def load_opts_from_file():
     retval = Options()
+    config_file_abs = get_config_file_path()
+
+    # Create config file if it doesn't exist
+    try:
+        if not os.path.isfile(config_file_abs):
+            create_config_file(config_file_abs)
+    except Exception as e:
+        print( error_msg_helper("creating new config file", e) )
+
+    # Parse config file, result to default values if error occurs
+    try:
+        config = configparser.ConfigParser()
+        config.read(config_file_abs)
+        section = config[default_section]
+        retval.click = True if section["click"] == "True" else False
+        retval.rows = int(section["rows"])
+        retval.columns = int(section["columns"])
+        retval.I = retval.rows * retval.columns
+        retval.plant_dim = int(section["plant_dim"])
+        retval.duration = float(section["duration"])
+    except Exception as e:
+        print( error_msg_helper("parsing config file", e, "Using default config") )
+        retval = Options()
+
+    return retval
+
+
+def get_opts():
+    retval = load_opts_from_file()
 
     if len(sys.argv) > 1:
         to_be_planted = sys.argv[1]
