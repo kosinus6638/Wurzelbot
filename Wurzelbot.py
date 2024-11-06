@@ -18,13 +18,18 @@ default_section = "DEFAULT"
 
 @dataclass
 class Options:
-    click = True
-    rows = 12
-    columns = 17
-    I = rows * columns
-    plant_dim = 40
-    horizontal = True
-    duration = 0.03
+    click: bool = True
+    rows: int = 12
+    columns: int = 17
+    plant_dim: int = 40
+    horizontal: bool = True
+    duration: float = 0.1
+
+    def __post_init__(self):
+        self.I = self.rows * self.columns
+
+    def __str__(self):
+        return str(self.__dict__)
 
 
 def error_msg_helper(what, err, appendix=None):
@@ -85,14 +90,14 @@ def load_opts_from_file():
         config = configparser.ConfigParser()
         config.read(config_file_abs)
         section = config[default_section]
-        retval.click = True if section["click"] == "True" else False
-        retval.rows = int(section["rows"])
-        retval.columns = int(section["columns"])
+        retval.click = section.getboolean("click", fallback=retval.click)
+        retval.rows = section.getint("rows", fallback=retval.rows, raw=False)
+        retval.columns = section.getint("columns", fallback=retval.columns)
         retval.I = retval.rows * retval.columns
-        retval.plant_dim = int(section["plant_dim"])
-        retval.duration = float(section["duration"])
-    except Exception as e:
-        print( error_msg_helper("parsing config file", e, "Using default config") )
+        retval.plant_dim = section.getint("plant_dim", fallback=retval.plant_dim)
+        retval.duration = section.getfloat("duration", fallback=retval.duration)
+    except ValueError as e:
+        print(error_msg_helper("parsing config file", e, "Using default config"))
         retval = Options()
 
     return retval
